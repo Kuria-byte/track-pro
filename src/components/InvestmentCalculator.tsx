@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import { useUser } from '../context/UserContext';
-import { Check, X, DollarSign } from 'lucide-react';
+import { Check, X, DollarSign, CreditCard } from 'lucide-react';
 import { formatPrice, conversionRates } from '../utils/storage';
 import { Currency } from '../types';
 import PaymentModal from './PaymentModal';
+
+// Add currency symbols and formatting config
+const CURRENCY_CONFIG = {
+  USD: { symbol: '$', position: 'before' },
+  KES: { symbol: 'KSh', position: 'before' },
+  GHS: { symbol: '₵', position: 'before' }
+} as const;
 
 const InvestmentCalculator: React.FC = () => {
   const { userData, toggleFeatureSelection, calculateTotalInvestment, setCurrency } = useUser();
@@ -17,24 +24,34 @@ const InvestmentCalculator: React.FC = () => {
   const formatPriceWithCurrency = (price: number) => {
     const rate = conversionRates[userData.selectedCurrency];
     const convertedPrice = Math.round(price * rate);
-    return formatPrice(convertedPrice, userData.selectedCurrency);
+    const config = CURRENCY_CONFIG[userData.selectedCurrency];
+    
+    const formattedNumber = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(convertedPrice);
+
+    return config.position === 'before' 
+      ? `${config.symbol}${formattedNumber}`
+      : `${formattedNumber} ${config.symbol}`;
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 transition-colors duration-200">
-      <div className="flex justify-between items-center mb-6">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
         <h2 className="text-xl font-bold text-gray-800 dark:text-white">Investment Calculator</h2>
-        <div className="flex items-center">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={userData.selectedCurrency}
             onChange={handleCurrencyChange}
-            className="mr-2 p-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+            className="p-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
           >
             <option value="USD">USD ($)</option>
             <option value="KES">KES (KSh)</option>
             <option value="GHS">GHS (₵)</option>
           </select>
-          <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+          <div className="text-lg sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400 min-w-[100px] text-right">
             {formatPriceWithCurrency(totalInvestment)}
           </div>
         </div>
@@ -102,9 +119,12 @@ const InvestmentCalculator: React.FC = () => {
           onClick={() => setIsPaymentModalOpen(true)}
           className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
         >
-          <DollarSign className="h-4 w-4 mr-2" />
-          <span>Commit 40% Now ({formatPriceWithCurrency(totalInvestment * 0.4)})</span>
+          <CreditCard className="h-4 w-4 mr-2" />
+          <span className="whitespace-nowrap">
+            Pay Initial {formatPriceWithCurrency(totalInvestment * 0.4)}
+          </span>
         </button>
+
 
         <PaymentModal
           isOpen={isPaymentModalOpen}

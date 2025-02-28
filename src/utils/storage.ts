@@ -36,8 +36,8 @@ const defaultUserData: UserData = {
       name: 'Dashboard & Content Management System', 
       description: 'Intuitive admin panel to manage products, orders, and content', 
       price: 350, 
-      mandatory: false, 
-      selected: false 
+      mandatory: true, 
+      selected: true 
     },
     { 
       id: '4', 
