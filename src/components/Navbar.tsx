@@ -1,6 +1,6 @@
 import React from 'react';
 import { useUser } from '../context/UserContext';
-import { LogOut, Moon, Sun, ShoppingBag } from 'lucide-react';
+import { LogOut, Moon, Sun, Workflow } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { logout, isDarkMode, toggleDarkMode } = useUser();
@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
     <nav className="bg-white dark:bg-gray-800 shadow-sm py-3 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center">
-          <ShoppingBag className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
+          <Workflow className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
           <span className="ml-2 text-xl font-bold text-gray-800 dark:text-white">Track-Pro</span>
         </div>
         

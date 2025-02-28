@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, ShoppingBag, Instagram, Twitter, Mail } from 'lucide-react';
+import { Heart, Instagram, Twitter, Mail, Workflow } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
           {/* Brand Section */}
           <div className="text-center md:text-left space-y-3">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center justify-center md:justify-start gap-2">
-              <ShoppingBag className="h-5 w-5 text-indigo-600 dark:text-indigo-400 animate-bounce" />
+              <Workflow className="h-5 w-5 text-indigo-600 dark:text-indigo-400 animate-bounce" />
               Track-Pro
             </h3>
             <p className="text-gray-600 dark:text-gray-300">

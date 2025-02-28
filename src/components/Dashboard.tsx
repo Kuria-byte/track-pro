@@ -20,19 +20,32 @@ const Dashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Header />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column */}
           <div className="space-y-8">
-            <ScopeOfWork />
-            <DocumentManager />
-            <TeamSection />
-          </div>
-          <div className="space-y-8">
-            <InvestmentCalculator />
-            <NextStepsTracker />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-8">
+              <ScopeOfWork />
+              <DocumentManager />
+              <TeamSection />
+            </div>
+            
+            {/* Notes and Schedule - Hidden on mobile, shown on desktop */}
+            <div className="hidden lg:block space-y-8">
               <NotesSection />
               <ScheduleMeeting />
             </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-8">
+            <InvestmentCalculator />
+            <NextStepsTracker />
+          </div>
+
+          {/* Notes and Schedule - Shown on mobile, hidden on desktop */}
+          <div className="lg:hidden space-y-8">
+            <NotesSection />
+            <ScheduleMeeting />
           </div>
         </div>
         
