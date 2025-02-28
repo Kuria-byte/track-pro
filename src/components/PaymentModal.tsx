@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { Copy, X, Check, Users } from 'lucide-react';
+import { Copy, Check, X, Share2, Users } from 'lucide-react';
 import { Currency } from '../types';
+import { formatPrice, conversionRates } from '../utils/storage';
+import toast from 'react-hot-toast';
+import emailjs from '@emailjs/browser';
 
 interface PaymentRecipient {
   name: string;
@@ -31,25 +34,48 @@ const PAYMENT_RECIPIENTS: PaymentRecipient[] = [
 const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, currency }) => {
   const [copied, setCopied] = useState(false);
   const [selectedRecipient, setSelectedRecipient] = useState<PaymentRecipient>(PAYMENT_RECIPIENTS[0]);
-  
+  const [referralEmail, setReferralEmail] = useState('');
+  const [isReferralOpen, setIsReferralOpen] = useState(false);
+
+  const formatAmount = (amount: number, currency: Currency) => {
+    const rate = conversionRates[currency];
+    const convertedAmount = Math.round(amount * rate);
+    return formatPrice(convertedAmount, currency);
+  };
+
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(selectedRecipient.phone);
       setCopied(true);
+      toast.success('Phone number copied!');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error("Failed to copy text: ", err);
+      toast.error('Failed to copy number');
+      console.error('Failed to copy number:', err);
     }
   };
 
-  const formatCurrency = (amount: number, currency: Currency) => {
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    });
-    return formatter.format(amount);
+  const handleReferral = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          to_email: 'ianmwitumi@gmail.com',
+          from_email: referralEmail,
+          referral_type: 'Investment Plan',
+          amount: formatAmount(amount, currency)
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      );
+      toast.success('Referral sent successfully!');
+      setReferralEmail('');
+      setIsReferralOpen(false);
+    } catch (error) {
+      toast.error('Failed to send referral');
+      console.error('Failed to send referral:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -84,7 +110,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, cu
               <div className="flex flex-col items-center space-y-1">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Amount Due</span>
                 <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {formatCurrency(amount, currency)}
+                  {formatAmount(amount, currency)}
                 </span>
               </div>
             </div>
@@ -144,6 +170,36 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, amount, cu
                 <p className="text-sm text-center text-gray-500 dark:text-gray-400">
                   Please make your payment using Mpesa to complete the transaction
                 </p>
+              </div>
+
+              {/* Refer a Friend Button */}
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                {!isReferralOpen ? (
+                  <button
+                    onClick={() => setIsReferralOpen(true)}
+                    className="w-full flex items-center justify-center p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md transition-colors duration-200"
+                  >
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Refer a Friend
+                  </button>
+                ) : (
+                  <form onSubmit={handleReferral} className="space-y-2">
+                    <input
+                      type="email"
+                      value={referralEmail}
+                      onChange={(e) => setReferralEmail(e.target.value)}
+                      placeholder="Friend's email address"
+                      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white p-2 rounded-md transition-colors duration-200"
+                    >
+                      Send Invitation
+                    </button>
+                  </form>
+                )}
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { UserData, ScopeItem, Feature, Milestone, Document, Note, Currency, DemoStatus } from '../types';
-import { getUserData, saveUserData, convertPrice } from '../utils/storage';
+import { UserData, ScopeItem, Feature, Milestone, Document, Note, Currency } from '../types';
+import { getUserData, saveUserData } from '../utils/storage';
 
 interface UserContextType {
   userData: UserData;
